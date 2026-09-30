@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { formatDistanceToNow } from "date-fns";
+import IssueMap from "@/components/Map";
 
 export const revalidate = 0;
 
@@ -19,6 +20,8 @@ export default async function FeedPage() {
             Civic <span className="text-primary">Pulse</span>
           </h1>
           <div className="flex space-x-4 text-sm font-semibold">
+            <Link href="/demo" className="text-gray-600 hover:text-primary transition-colors">Demo</Link>
+            <Link href="/pulse" className="text-gray-600 hover:text-primary transition-colors">Pulse</Link>
             <Link href="/profile" className="text-gray-600 hover:text-primary transition-colors">Profile</Link>
           </div>
         </div>
@@ -28,6 +31,8 @@ export default async function FeedPage() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-extrabold tracking-tight">Riverside Feed</h2>
         </div>
+
+        <IssueMap issues={issues || []} />
 
         {issues && issues.length > 0 ? (
           issues.map((issue) => (
