@@ -3,3 +3,5 @@ packages:
   - "worker"
   - "packages/*"
 
+allowBuilds:
+  unrs-resolver: true
