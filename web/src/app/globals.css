@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+  
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --color-status-processing: #9ca3af;
+  --color-status-open: #3b82f6;
+  --color-status-acknowledged: #8b5cf6;
+  --color-status-in-progress: #f59e0b;
+  --color-status-resolved: #10b981;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased;
+  }
+}

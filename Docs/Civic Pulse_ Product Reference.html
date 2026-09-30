@@ -1,0 +1,1892 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
+</head><body>
+<h1>Civic Pulse: Product Reference</h1>
+<p><strong>Version 0.1 (working draft) · 30 Sep 2026</strong></p>
+<p><strong>How to use this doc.</strong> Feature IDs (e.g. <code>ESC-04</code>) are stable, so use them in tickets and commits. Priorities: <strong>P1</strong> = MVP / pilot launch, <strong>P2</strong> = fast follow, <strong>P3</strong> = later. Numbers marked <em>(tunable)</em> are starting defaults to adjust during the pilot. Open questions are collected in §15 as D1 to D14.</p>
+<p><strong>Contents:</strong> 1 Vision · 2 Roles · 3 Concepts · 4 Feature list · 5 Photo, location &amp; privacy system · 6 Auto-escalation system · 7 Ranking, karma &amp; anti-gaming · 8 Data model · 9 Lifecycle &amp; resolution · 10 Limits &amp; rules · 11 Suggested architecture · 12 Roadmap · 13 Metrics · 14 Risks · 15 Open decisions</p>
+<hr>
+<h2>1. Vision &amp; principles</h2>
+<p><strong>One-liner.</strong> Civic Pulse is a hyperlocal platform where residents report problems in their area, the community validates and ranks them, and popular issues are automatically escalated to the responsible local authority, with a public trail from &quot;reported&quot; to &quot;resolved&quot;.</p>
+<p><strong>The problem.</strong> People have no simple way to report a local problem, see whether neighbours share it, know who is responsible, or find out whether anything happened. Today's channels (phone calls, office visits, scattered social posts) are fragmented and opaque.</p>
+<p><strong>Principles</strong></p>
+<ol>
+<li><strong>Resolution over engagement.</strong> Success is issues resolved, not posts or time on site.</li>
+<li><strong>Problems, not people.</strong> Content is about issues and institutions, never about shaming individuals.</li>
+<li><strong>Privacy by default.</strong> Faces blurred, metadata stripped, minimal personal data leaves the platform.</li>
+<li><strong>Signal over noise.</strong> Support must come from real, distinct, local people, so anti-gaming is a core feature.</li>
+<li><strong>Transparent by default.</strong> Every issue has a public timeline and every escalation is visible.</li>
+<li><strong>Local first.</strong> Launch in one locality, then repeat the pattern.</li>
+<li><strong>Mobile first.</strong> Most reports will be made from a phone, at the spot.</li>
+</ol>
+<p><strong>Decisions already made</strong></p>
+<ul>
+<li>Any civic problem is in scope: infrastructure, services and bureaucratic delays.</li>
+<li>Karma-style upvoting drives popularity.</li>
+<li>Issues that reach a popularity threshold are automatically sent to the responsible local authority.</li>
+<li>Photos are captured through the website and location is detected automatically.</li>
+<li>Every face in every image is blurred automatically.</li>
+<li>Authorities start as external recipients with no account (<em>assumption</em>; official accounts arrive in P3).</li>
+</ul>
+<hr>
+<h2>2. Users &amp; roles</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Who</th>
+<th>Can do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visitor</td>
+<td>Not signed in</td>
+<td>Browse public issues and the Pulse dashboard. No voting or commenting.</td>
+</tr>
+<tr>
+<td>Resident</td>
+<td>Signed in, phone or email verified</td>
+<td>Post, support, comment, follow, flag.</td>
+</tr>
+<tr>
+<td>Verified Resident</td>
+<td>Locality confirmed (ACC-05)</td>
+<td>Everything above, full weight toward escalation, can confirm resolutions.</td>
+</tr>
+<tr>
+<td>Moderator</td>
+<td>Trained volunteer or staff, per locality</td>
+<td>Review flags, hide or restore content, merge duplicates, add blur boxes, warn users.</td>
+</tr>
+<tr>
+<td>Locality Admin</td>
+<td>Runs one locality's setup</td>
+<td>Manage boundary, categories, authority routing, thresholds, escalation mode.</td>
+</tr>
+<tr>
+<td>Platform Admin</td>
+<td>Core team</td>
+<td>Everything, plus audit logs, feature flags, kill switches.</td>
+</tr>
+<tr>
+<td>Authority Contact</td>
+<td>External recipient, no account</td>
+<td>Acknowledge and update status through signed links (ESC-04).</td>
+</tr>
+<tr>
+<td>Official Account</td>
+<td>Verified department account (P3)</td>
+<td>Post official updates, change status, reply publicly.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>3. Core concepts</h2>
+<ul>
+<li><strong>Issue:</strong> a post reporting one problem. Types: <em>location</em> (has a pin), <em>office</em> (tied to an office or department), or <em>both</em>.</li>
+<li><strong>Locality:</strong> the geographic unit for feeds and thresholds (pilot: one ward, neighbourhood or campus). Has a boundary polygon.</li>
+<li><strong>Authority:</strong> the body responsible for fixing a category of issue in an area (ward office, roads department, water board).</li>
+<li><strong>Support:</strong> the positive signals on an issue: <em>Upvote</em> (&quot;this should be fixed&quot;) and <em>Affected too</em> (&quot;this affects me&quot;).</li>
+<li><strong>Support score (S):</strong> weighted count of unique supporters; drives ranking and escalation (§7).</li>
+<li><strong>Karma:</strong> a user's reputation, earned mostly from outcomes (§7).</li>
+<li><strong>Escalation:</strong> automatic sending of an issue to its responsible authority once thresholds are met (§6).</li>
+<li><strong>Pulse:</strong> the live, aggregate view of a locality's issues.</li>
+</ul>
+<hr>
+<h2>4. Feature list</h2>
+<p>Columns: ID · feature · priority · details. Sections 5 to 7 hold the detailed specs for photos and location, escalation, and ranking.</p>
+<h3>4.1 Accounts &amp; identity (ACC)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACC-01</td>
+<td>Sign-up / login</td>
+<td>P1</td>
+<td>Phone OTP (recommended: harder to mass-create than email) plus optional email or Google login. OTP rate limits, CAPTCHA on sign-up.</td>
+</tr>
+<tr>
+<td>ACC-02</td>
+<td>Public handle</td>
+<td>P1</td>
+<td>Unique pseudonym shown publicly; real name never required. Limited handle changes.</td>
+</tr>
+<tr>
+<td>ACC-03</td>
+<td>Generated avatars</td>
+<td>P1</td>
+<td>No photo avatars, so the &quot;no faces&quot; rule covers every image on the site.</td>
+</tr>
+<tr>
+<td>ACC-04</td>
+<td>Home locality</td>
+<td>P1</td>
+<td>Chosen at sign-up (suggested from device location, confirmed by the user). Other localities are read-only.</td>
+</tr>
+<tr>
+<td>ACC-05</td>
+<td>Verified Resident</td>
+<td>P2</td>
+<td>Earned passively: verified phone plus at least 2 location-checked actions inside the locality on different days, or manual moderator approval.</td>
+</tr>
+<tr>
+<td>ACC-06</td>
+<td>Profile page</td>
+<td>P1</td>
+<td>Handle, karma, level, badges, join date, issues reported, resolved count. No contact details.</td>
+</tr>
+<tr>
+<td>ACC-07</td>
+<td>Anonymous posting</td>
+<td>P2</td>
+<td>Public label &quot;Anonymous resident&quot;, still tied to the account internally for moderation. Useful for sensitive service-delay reports.</td>
+</tr>
+<tr>
+<td>ACC-08</td>
+<td>Account deletion &amp; data export</td>
+<td>P1</td>
+<td>User chooses: delete their issues, or keep them under &quot;Deleted user&quot;. JSON export. Required by most privacy laws.</td>
+</tr>
+<tr>
+<td>ACC-09</td>
+<td>Terms &amp; age gate</td>
+<td>P1</td>
+<td>Accept Terms, Privacy Policy and Guidelines; minimum age per local law (commonly 13 to 16+).</td>
+</tr>
+<tr>
+<td>ACC-10</td>
+<td>Session security</td>
+<td>P1</td>
+<td>Device/session list, log out everywhere. 2FA in P3.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 Reporting an issue (RPT)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RPT-01</td>
+<td>Issue form</td>
+<td>P1</td>
+<td>Title (10 to 100 chars), description (up to 2,000), category (required), issue type (location / office / both), severity (Nuisance / Inconvenient / Hazard), location or office, photos (up to 5), duration (&quot;how long has this been a problem?&quot;), prior attempts (&quot;did you already report this? reference no.&quot;).</td>
+</tr>
+<tr>
+<td>RPT-02</td>
+<td>Categories</td>
+<td>P1</td>
+<td>Starter list: Roads &amp; potholes · Streetlights &amp; electricity · Water &amp; drainage · Waste &amp; sanitation · Public transport · Parks &amp; public spaces · Public safety (non-emergency) · Noise &amp; pollution · Encroachment &amp; illegal construction · Health &amp; education facilities · Government service delays · Other. Configurable per locality.</td>
+</tr>
+<tr>
+<td>RPT-03</td>
+<td>Live capture &amp; auto-location</td>
+<td>P1</td>
+<td>See §5.</td>
+</tr>
+<tr>
+<td>RPT-04</td>
+<td>Duplicate check</td>
+<td>P1</td>
+<td>After location is set, show similar open issues nearby (same category within 200 m <em>(tunable)</em> plus text similarity) with a &quot;Support this instead&quot; button. Author may still post. Moderators can merge later; supporters carry over.</td>
+</tr>
+<tr>
+<td>RPT-05</td>
+<td>Routing preview</td>
+<td>P1</td>
+<td>Before submit: &quot;If this gains enough support it will be sent to: [Authority]&quot;, with the threshold.</td>
+</tr>
+<tr>
+<td>RPT-06</td>
+<td>Review-and-publish step</td>
+<td>P1</td>
+<td>User sees processed (blurred) photos and final details, then taps Publish. Nothing is public until images pass the pipeline.</td>
+</tr>
+<tr>
+<td>RPT-07</td>
+<td>Drafts &amp; weak networks</td>
+<td>P1</td>
+<td>Autosave; retry uploads on poor connections. Full offline draft queue in P2 (PWA).</td>
+</tr>
+<tr>
+<td>RPT-08</td>
+<td>Edit rules</td>
+<td>P1</td>
+<td>Free edits for 15 minutes <em>(tunable)</em>; afterwards edits are logged with visible history. Category and location lock once escalated.</td>
+</tr>
+<tr>
+<td>RPT-09</td>
+<td>Delete / withdraw</td>
+<td>P1</td>
+<td>Delete only if there are no supporters or comments; otherwise &quot;Withdraw&quot; (stays visible, marked withdrawn), so popular issues cannot vanish after escalation.</td>
+</tr>
+<tr>
+<td>RPT-10</td>
+<td>Area-wide issues</td>
+<td>P2</td>
+<td>Scope: Spot (pin) or Area (pin plus radius), for things like power cuts or water shortages.</td>
+</tr>
+<tr>
+<td>RPT-11</td>
+<td>Service-delay template</td>
+<td>P2</td>
+<td>Office name, application date, promised date, partial reference number; delay length is computed and displayed.</td>
+</tr>
+<tr>
+<td>RPT-12</td>
+<td>Emergency notice</td>
+<td>P1</td>
+<td>Shown for Hazard and Public safety: &quot;Civic Pulse is not an emergency service. In immediate danger, call [local emergency number].&quot; Configured per locality.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 Photos, location &amp; privacy (IMG), spec in §5</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IMG-01</td>
+<td>In-browser camera capture</td>
+<td>P1</td>
+<td>Live viewfinder in the site; native-camera fallback on mobile; gallery upload as a flagged fallback (§5.2).</td>
+</tr>
+<tr>
+<td>IMG-02</td>
+<td>Auto-location</td>
+<td>P1</td>
+<td>Device location at capture (primary), EXIF GPS (secondary), manual pin (fallback) (§5.3).</td>
+</tr>
+<tr>
+<td>IMG-03</td>
+<td>&quot;Location verified&quot; badge</td>
+<td>P1</td>
+<td>Shown only when the checks in §5.3 pass.</td>
+</tr>
+<tr>
+<td>IMG-04</td>
+<td>Metadata stripping</td>
+<td>P1</td>
+<td>All EXIF, XMP and IPTC removed from every stored image.</td>
+</tr>
+<tr>
+<td>IMG-05</td>
+<td>Automatic face blur</td>
+<td>P1</td>
+<td>Server-side, fail-closed, every image (§5.5).</td>
+</tr>
+<tr>
+<td>IMG-06</td>
+<td>Manual blur tool</td>
+<td>P1</td>
+<td>Users can add blur regions; nobody can remove a blur.</td>
+</tr>
+<tr>
+<td>IMG-07</td>
+<td>&quot;Report unblurred face&quot;</td>
+<td>P1</td>
+<td>One report hides the image instantly for review.</td>
+</tr>
+<tr>
+<td>IMG-08</td>
+<td>On-device pre-blur</td>
+<td>P2</td>
+<td>Faces blurred in the browser before upload, so raw faces never leave the phone.</td>
+</tr>
+<tr>
+<td>IMG-09</td>
+<td>Number-plate blur</td>
+<td>P2</td>
+<td>Vehicle plates detected and blurred.</td>
+</tr>
+<tr>
+<td>IMG-10</td>
+<td>Duplicate-photo detection</td>
+<td>P2</td>
+<td>Perceptual hash catches reused or re-posted images.</td>
+</tr>
+<tr>
+<td>IMG-11</td>
+<td>Before / after photos</td>
+<td>P2</td>
+<td>Live-captured &quot;after&quot; photo near the pin as resolution proof (§9).</td>
+</tr>
+<tr>
+<td>IMG-12</td>
+<td>Video</td>
+<td>P3</td>
+<td>Out of scope until the image pipeline is proven; moderation and blurring are far harder.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Feed &amp; discovery (FED)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FED-01</td>
+<td>Locality feed</td>
+<td>P1</td>
+<td>Default feed is the user's locality. Radius mode (1, 3, 5 km <em>(tunable)</em>) until boundaries are loaded.</td>
+</tr>
+<tr>
+<td>FED-02</td>
+<td>Sort tabs</td>
+<td>P1</td>
+<td>Trending, New, Top (week / month / all time), Unresolved, Most overdue, Recently resolved, Near me.</td>
+</tr>
+<tr>
+<td>FED-03</td>
+<td>Filters</td>
+<td>P1</td>
+<td>Category, status, severity, escalated, has photo, distance, date range.</td>
+</tr>
+<tr>
+<td>FED-04</td>
+<td>Map view</td>
+<td>P1</td>
+<td>Clustered pins coloured by status; tap for preview; search within map bounds. Heatmap in P2.</td>
+</tr>
+<tr>
+<td>FED-05</td>
+<td>Issue card</td>
+<td>P1</td>
+<td>Blurred photo, title, category and status chips, support and comment counts, age, distance, escalation badge, threshold progress.</td>
+</tr>
+<tr>
+<td>FED-06</td>
+<td>Issue page</td>
+<td>P1</td>
+<td>Gallery, description, map, support buttons, responsible authority, timeline, comments, related issues, share.</td>
+</tr>
+<tr>
+<td>FED-07</td>
+<td>Search</td>
+<td>P1</td>
+<td>Full-text over title, description, category, area. Typo tolerance in P2.</td>
+</tr>
+<tr>
+<td>FED-08</td>
+<td>Follow / save issue</td>
+<td>P1</td>
+<td>Get updates; saved list on profile.</td>
+</tr>
+<tr>
+<td>FED-09</td>
+<td>Nearby alerts</td>
+<td>P2</td>
+<td>&quot;Tell me about new issues within X km&quot;, plus category follows.</td>
+</tr>
+<tr>
+<td>FED-10</td>
+<td>Share &amp; link previews</td>
+<td>P1</td>
+<td>Public URL with social preview (blurred photo, title, support count, status); WhatsApp, X and copy-link buttons.</td>
+</tr>
+<tr>
+<td>FED-11</td>
+<td>Public and indexable</td>
+<td>P1</td>
+<td>Issue pages are public and search-indexable unless hidden or sensitive; sitemap per locality.</td>
+</tr>
+<tr>
+<td>FED-12</td>
+<td>Browse other localities</td>
+<td>P2</td>
+<td>Read-only.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.5 Community engagement (ENG)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ENG-01</td>
+<td>Upvote</td>
+<td>P1</td>
+<td>One per user per issue; removable.</td>
+</tr>
+<tr>
+<td>ENG-02</td>
+<td>&quot;Affected too&quot;</td>
+<td>P1</td>
+<td>One tap upgrades the upvote; optional &quot;since when&quot;. Higher weight (§7.1).</td>
+</tr>
+<tr>
+<td>ENG-03</td>
+<td>Comments</td>
+<td>P1</td>
+<td>Up to 1,000 chars, one reply level, edit within 10 min <em>(tunable)</em>, delete own, sort by Top or Newest. No images in comments for the MVP.</td>
+</tr>
+<tr>
+<td>ENG-04</td>
+<td>Helpful marks</td>
+<td>P2</td>
+<td>Upvote comments; earns small karma.</td>
+</tr>
+<tr>
+<td>ENG-05</td>
+<td>Comment tags</td>
+<td>P2</td>
+<td>&quot;Suggested fix&quot; and &quot;Who to contact&quot; tags.</td>
+</tr>
+<tr>
+<td>ENG-06</td>
+<td>Flag / report</td>
+<td>P1</td>
+<td>On issues, comments and images. Reasons: spam, false info, harassment, private info, unblurred face or plate, offensive image, off-topic, duplicate, emergency.</td>
+</tr>
+<tr>
+<td>ENG-07</td>
+<td>No downvotes</td>
+<td>P1</td>
+<td>Deliberate: downvotes would let people bury neighbours' problems. Use flags instead (D3).</td>
+</tr>
+<tr>
+<td>ENG-08</td>
+<td>&quot;I can help&quot;</td>
+<td>P3</td>
+<td>Community groups or NGOs offer to fix or support an issue.</td>
+</tr>
+<tr>
+<td>ENG-09</td>
+<td>Mentions</td>
+<td>P3</td>
+<td>@handle in comments.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.6 Ranking, karma &amp; anti-gaming (RNK), spec in §7</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNK-01</td>
+<td>Weighted support score</td>
+<td>P1</td>
+<td>§7.1.</td>
+</tr>
+<tr>
+<td>RNK-02</td>
+<td>Trending / Top / Most overdue ranking</td>
+<td>P1</td>
+<td>§7.2.</td>
+</tr>
+<tr>
+<td>RNK-03</td>
+<td>Outcome-based karma</td>
+<td>P1</td>
+<td>§7.3.</td>
+</tr>
+<tr>
+<td>RNK-04</td>
+<td>Levels and badges</td>
+<td>P1 levels, P2 badges</td>
+<td>§7.4.</td>
+</tr>
+<tr>
+<td>RNK-05</td>
+<td>Anti-gaming controls</td>
+<td>P1</td>
+<td>§7.5.</td>
+</tr>
+<tr>
+<td>RNK-06</td>
+<td>Leaderboards</td>
+<td>P2</td>
+<td>Weekly and monthly top contributors, ranked by confirmed outcomes rather than vote counts.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.7 Issue lifecycle (LIF), spec in §9</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LIF-01</td>
+<td>Status workflow</td>
+<td>P1</td>
+<td>Processing → Open → Acknowledged → In progress → Awaiting confirmation → Resolved; side states Duplicate, Rejected, Withdrawn.</td>
+</tr>
+<tr>
+<td>LIF-02</td>
+<td>Who can change status</td>
+<td>P1</td>
+<td>Authority via signed link, moderators and admins (logged with reason); authors can withdraw. Nobody confirms their own resolution.</td>
+</tr>
+<tr>
+<td>LIF-03</td>
+<td>Public timeline</td>
+<td>P1</td>
+<td>Every event: posted, milestones, escalations, deliveries, acknowledgements, updates, resolutions.</td>
+</tr>
+<tr>
+<td>LIF-04</td>
+<td>Author updates</td>
+<td>P1</td>
+<td>Author can append dated updates (with photos) after the edit window.</td>
+</tr>
+<tr>
+<td>LIF-05</td>
+<td>Community-confirmed resolution</td>
+<td>P2</td>
+<td>§9. In P1, a moderator or admin confirms.</td>
+</tr>
+<tr>
+<td>LIF-06</td>
+<td>Before / after view</td>
+<td>P2</td>
+<td>Blurred side-by-side, shareable.</td>
+</tr>
+<tr>
+<td>LIF-07</td>
+<td>Reopen &amp; dispute</td>
+<td>P2</td>
+<td>Community &quot;still not fixed&quot; reopens the issue and re-notifies the authority.</td>
+</tr>
+<tr>
+<td>LIF-08</td>
+<td>Recurrence link</td>
+<td>P2</td>
+<td>&quot;Same problem again&quot; on a resolved issue creates a new linked issue; tracks repeat failures.</td>
+</tr>
+<tr>
+<td>LIF-09</td>
+<td>Stale-issue check</td>
+<td>P2</td>
+<td>After 90 days <em>(tunable)</em> without activity, ask the author &quot;Still a problem?&quot;; archive if no.</td>
+</tr>
+<tr>
+<td>LIF-10</td>
+<td>Duplicate merge</td>
+<td>P1</td>
+<td>Moderator merges; supporters and comments carry over; old URL redirects.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.8 Auto-escalation (ESC), spec in §6</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ESC-01</td>
+<td>Threshold engine</td>
+<td>P1</td>
+<td>Tiered thresholds L0 to L3 per locality, category and severity (§6.3).</td>
+</tr>
+<tr>
+<td>ESC-02</td>
+<td>Authority routing</td>
+<td>P1</td>
+<td>Category plus location resolves to the responsible authority (§6.4).</td>
+</tr>
+<tr>
+<td>ESC-03</td>
+<td>Escalation packet</td>
+<td>P1</td>
+<td>Email with blurred photos, map link, support stats and response links (§6.5).</td>
+</tr>
+<tr>
+<td>ESC-04</td>
+<td>Authority response links</td>
+<td>P1</td>
+<td>Signed one-click Acknowledge / In progress / Resolved / Wrong department; no login.</td>
+</tr>
+<tr>
+<td>ESC-05</td>
+<td>Reminders &amp; next-level escalation</td>
+<td>P1</td>
+<td>Reminders at +7, +14, +30 days, then L2 (§6.7).</td>
+</tr>
+<tr>
+<td>ESC-06</td>
+<td>Rollout modes</td>
+<td>P1</td>
+<td>Off → Shadow → Approve → Auto, per locality (§6.8).</td>
+</tr>
+<tr>
+<td>ESC-07</td>
+<td>Public threshold progress</td>
+<td>P1</td>
+<td>Progress bar on every issue (&quot;18 of 25 supporters needed&quot;).</td>
+</tr>
+<tr>
+<td>ESC-08</td>
+<td>Public escalation timeline</td>
+<td>P1</td>
+<td>Sent, delivered and acknowledged events shown on the issue.</td>
+</tr>
+<tr>
+<td>ESC-09</td>
+<td>Guardrails</td>
+<td>P1</td>
+<td>Rate limits, digests, clustering, freeze-after-send, kill switch (§6.8).</td>
+</tr>
+<tr>
+<td>ESC-10</td>
+<td>Portal / API adapters</td>
+<td>P2</td>
+<td>Integrate with official grievance systems (§6.6).</td>
+</tr>
+<tr>
+<td>ESC-11</td>
+<td>WhatsApp / SMS for hazards</td>
+<td>P2</td>
+<td>Faster channel for urgent escalations.</td>
+</tr>
+<tr>
+<td>ESC-12</td>
+<td>Reply-by-email parsing</td>
+<td>P2</td>
+<td>Authority replies are captured onto the timeline.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.9 Pulse dashboard &amp; accountability (PLS)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLS-01</td>
+<td>Locality Pulse page</td>
+<td>P1</td>
+<td>Open and resolved counts, resolved this month, median time to first response, median time to resolution, top 10 unresolved by support, category breakdown, trending this week, new-vs-resolved trend, map.</td>
+</tr>
+<tr>
+<td>PLS-02</td>
+<td>Personal impact page</td>
+<td>P1</td>
+<td>Issues you reported, supported and saw resolved.</td>
+</tr>
+<tr>
+<td>PLS-03</td>
+<td>Authority scoreboard</td>
+<td>P2</td>
+<td>Per authority: issues received, acknowledgement rate, median response time, resolution rate, backlog. Public, labelled &quot;based on Civic Pulse reports, not official statistics&quot;, with a right of reply.</td>
+</tr>
+<tr>
+<td>PLS-04</td>
+<td>Locality report</td>
+<td>P2</td>
+<td>Auto-generated weekly or monthly &quot;Top unresolved issues&quot; page and PDF; shareable, sent to authorities and representatives.</td>
+</tr>
+<tr>
+<td>PLS-05</td>
+<td>Open data export</td>
+<td>P3</td>
+<td>Anonymised CSV / API for journalists and researchers.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.10 Notifications (NTF)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NTF-01</td>
+<td>Channels</td>
+<td>P1 / P2 / P3</td>
+<td>P1 in-app and email; P2 web push (PWA); P3 SMS / WhatsApp.</td>
+</tr>
+<tr>
+<td>NTF-02</td>
+<td>Author events</td>
+<td>P1</td>
+<td>Photos processed, post live, support milestones (10, 25, 50, 100), escalated, delivered, acknowledged, status change, comments (batched), resolution confirmation requests, moderation decisions.</td>
+</tr>
+<tr>
+<td>NTF-03</td>
+<td>Supporter / follower events</td>
+<td>P1</td>
+<td>Escalation, status changes, resolution confirmation request.</td>
+</tr>
+<tr>
+<td>NTF-04</td>
+<td>Moderator &amp; admin alerts</td>
+<td>P1</td>
+<td>New flags, unblurred-face reports, delivery failures, unrouted issues.</td>
+</tr>
+<tr>
+<td>NTF-05</td>
+<td>Preferences</td>
+<td>P1</td>
+<td>Per channel and per type toggles, quiet hours, daily or weekly digest.</td>
+</tr>
+<tr>
+<td>NTF-06</td>
+<td>Batching &amp; limits</td>
+<td>P1</td>
+<td>Group similar events, cap notifications per hour, unsubscribe link in every email.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.11 Trust, safety &amp; moderation (MOD)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MOD-01</td>
+<td>Guidelines &amp; Terms</td>
+<td>P1</td>
+<td>Rules in §10, accepted at sign-up.</td>
+</tr>
+<tr>
+<td>MOD-02</td>
+<td>Flag intake &amp; queue</td>
+<td>P1</td>
+<td>Sorted by severity and flag count. Actions: approve, hide, edit out personal info, merge, warn, suspend, ban. Reason codes; audit-logged.</td>
+</tr>
+<tr>
+<td>MOD-03</td>
+<td>Auto-moderation</td>
+<td>P1</td>
+<td>Profanity and hate filter; PII detection in text (phone numbers, emails, ID numbers, vehicle plates) with warn or redact; NSFW / graphic image classifier; spam heuristics (new account plus links plus repetition).</td>
+</tr>
+<tr>
+<td>MOD-04</td>
+<td>Auto-hide</td>
+<td>P1</td>
+<td>Hide pending review at N flags from distinct users <em>(tunable)</em>, weighted by flagger reliability to resist brigading. Unblurred-face reports hide instantly.</td>
+</tr>
+<tr>
+<td>MOD-05</td>
+<td>Escalation hold</td>
+<td>P1</td>
+<td>Flagged or under-review issues cannot escalate (§6.2).</td>
+</tr>
+<tr>
+<td>MOD-06</td>
+<td>Sanction ladder</td>
+<td>P1</td>
+<td>Warning, 24 h posting block, 7 days, permanent; shadow-limit for spam; karma penalties.</td>
+</tr>
+<tr>
+<td>MOD-07</td>
+<td>Appeals</td>
+<td>P2</td>
+<td>A second moderator reviews.</td>
+</tr>
+<tr>
+<td>MOD-08</td>
+<td>Sensitive-category hold</td>
+<td>P2</td>
+<td>Reports of misconduct or corruption are reviewed before going public and must be factual.</td>
+</tr>
+<tr>
+<td>MOD-09</td>
+<td>Takedown &amp; right of reply</td>
+<td>P1 process, P2 tooling</td>
+<td>Contact channel for individuals, officials and authorities; logged, with a response SLA.</td>
+</tr>
+<tr>
+<td>MOD-10</td>
+<td>Moderator onboarding &amp; conflicts</td>
+<td>P1</td>
+<td>Guidelines training; moderators cannot act on issues they authored or supported.</td>
+</tr>
+<tr>
+<td>MOD-11</td>
+<td>Transparency report</td>
+<td>P3</td>
+<td>Monthly moderation stats.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.12 Admin &amp; operations (ADM)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADM-01</td>
+<td>Locality setup</td>
+<td>P1</td>
+<td>Boundary upload (GeoJSON / KML), map centre, categories, languages, time zone, emergency numbers.</td>
+</tr>
+<tr>
+<td>ADM-02</td>
+<td>Authority directory</td>
+<td>P1</td>
+<td>Name, level, parent (escalation chain), jurisdiction polygon, categories, contact channels, languages, working hours, expected response time, verified flag, delivery health.</td>
+</tr>
+<tr>
+<td>ADM-03</td>
+<td>Routing tester</td>
+<td>P1</td>
+<td>Enter a category and coordinates; see the resolved authority and why.</td>
+</tr>
+<tr>
+<td>ADM-04</td>
+<td>Threshold config</td>
+<td>P1</td>
+<td>Per locality, category and severity; versioned with effective date; mode Off / Shadow / Approve / Auto.</td>
+</tr>
+<tr>
+<td>ADM-05</td>
+<td>Escalation console</td>
+<td>P1</td>
+<td>Queue, sent, failed, unrouted. Approve, resend, &quot;escalate now&quot;, retract; pause per authority, per locality or globally.</td>
+</tr>
+<tr>
+<td>ADM-06</td>
+<td>Template editor</td>
+<td>P1</td>
+<td>Email templates with variables, preview, per-language versions.</td>
+</tr>
+<tr>
+<td>ADM-07</td>
+<td>User management</td>
+<td>P1</td>
+<td>Search, activity, sanctions, manual verification.</td>
+</tr>
+<tr>
+<td>ADM-08</td>
+<td>Analytics dashboard</td>
+<td>P1</td>
+<td>Engagement, resolution, response times, pipeline health, flags, escalations (§13).</td>
+</tr>
+<tr>
+<td>ADM-09</td>
+<td>Audit log</td>
+<td>P1</td>
+<td>Immutable record of every admin, moderator and system action.</td>
+</tr>
+<tr>
+<td>ADM-10</td>
+<td>Feature flags &amp; config</td>
+<td>P1</td>
+<td>Toggle features per locality without deploys.</td>
+</tr>
+<tr>
+<td>ADM-11</td>
+<td>Team-reported issues</td>
+<td>P1</td>
+<td>Staff can post on behalf of partner groups during the pilot, clearly labelled.</td>
+</tr>
+<tr>
+<td>ADM-12</td>
+<td>Data-request tools</td>
+<td>P1</td>
+<td>Export, deletion and legal takedown handling.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.13 Support, content &amp; growth (SUP)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Feature</th>
+<th>Pri</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SUP-01</td>
+<td>Onboarding</td>
+<td>P1</td>
+<td>Three-screen intro and a guided first report.</td>
+</tr>
+<tr>
+<td>SUP-02</td>
+<td>Static pages</td>
+<td>P1</td>
+<td>About, How it works, Guidelines, Terms, Privacy, Contact, FAQ.</td>
+</tr>
+<tr>
+<td>SUP-03</td>
+<td>Feedback</td>
+<td>P1</td>
+<td>In-app feedback and bug-report button.</td>
+</tr>
+<tr>
+<td>SUP-04</td>
+<td>Waitlist</td>
+<td>P1</td>
+<td>For areas where Civic Pulse is not live yet.</td>
+</tr>
+<tr>
+<td>SUP-05</td>
+<td>Invite neighbours</td>
+<td>P2</td>
+<td>Referral link and printable QR poster for a locality.</td>
+</tr>
+<tr>
+<td>SUP-06</td>
+<td>Changelog / status page</td>
+<td>P3</td>
+<td>Public release notes and uptime.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.14 Non-functional requirements (NFR)</h3>
+<ul>
+<li><strong>Mobile first, low-end friendly.</strong> Responsive, installable PWA (P2), usable on 3G/4G: client-side image compression, lazy loading, skeleton screens. Targets <em>(tunable)</em>: feed p95 under 1.5 s on 4G, issue page LCP under 2.5 s, photo processing p95 under 10 s.</li>
+<li><strong>Accessibility.</strong> WCAG 2.1 AA, keyboard navigation, sufficient contrast, status never shown by colour alone, alt text (user-provided or generated from category).</li>
+<li><strong>Internationalisation.</strong> All strings externalised from day one; local language(s) at launch (D11); RTL-ready. Auto-translation of posts is P3.</li>
+<li><strong>Security.</strong> HTTPS everywhere (also required for camera and location APIs), OWASP Top 10 controls, CSRF/XSS protection, rate limiting, strict upload validation, signed URLs for private assets, secrets management, dependency scanning, bot protection.</li>
+<li><strong>Reliability.</strong> Queue-based jobs with retries and dead-letter queues; idempotent escalation sending (never double-send); daily backups with tested restores; monitoring and alerting.</li>
+<li><strong>SEO &amp; sharing.</strong> Server-rendered public pages, Open Graph tags, sitemaps.</li>
+<li><strong>Observability.</strong> Structured logs, metrics and tracing, especially on the image and escalation pipelines.</li>
+<li><strong>Analytics.</strong> Privacy-friendly and cookieless where possible; consent where the law requires it.</li>
+<li><strong>Legal.</strong> Terms, Privacy Policy, cookie notice, Guidelines, takedown policy; compliance with the data-protection law of the launch region (e.g. GDPR, CCPA, DPDP).</li>
+</ul>
+<hr>
+<h2>5. Photo capture, location &amp; privacy system</h2>
+<h3>5.1 Goals</h3>
+<p>Photos are fresh and taken at the spot · location fills in automatically · no face or hidden metadata ever reaches public view · it all works on low-end phones and weak networks.</p>
+<h3>5.2 Capture flow</h3>
+<ol>
+<li><strong>Prime permissions.</strong> A short screen explains why camera and location are needed before the browser prompt appears. Both APIs require HTTPS.</li>
+<li><strong>Live capture.</strong> The camera opens inside the page (live viewfinder, rear camera by default). Where that fails on mobile, fall back to the native camera through a file input with <code>capture=&quot;environment&quot;</code>. Up to 5 photos per issue.</li>
+<li><strong>Record capture context</strong> for every shot: device coordinates, accuracy in metres, timestamp. This matters because frames grabbed from a live viewfinder carry no EXIF at all.</li>
+<li><strong>Location step.</strong> A map shows the pin and reverse-geocoded address; the user can drag to adjust. If accuracy is worse than about 50 m <em>(tunable)</em>, ask them to place the pin precisely.</li>
+<li><strong>Client-side prep.</strong> Apply orientation, downscale to about 1,600 px on the long edge <em>(tunable)</em>, compress (JPEG or WebP, around 80% quality), upload with the location payload.</li>
+<li><strong>Server processing</strong> (§5.4), shown as &quot;Processing photos…&quot; (target under 10 s).</li>
+<li><strong>Review and publish.</strong> The user sees the blurred result, can add more blur regions or retake, then publishes.</li>
+</ol>
+<p><strong>Gallery-upload fallback.</strong> Allowed for desktop users, blocked cameras and accessibility. The post gets a &quot;Location not verified&quot; label and requires a manual pin. Recommended default: live capture is the main path, and only live-captured photos can earn the verified-location badge (D4).</p>
+<h3>5.3 Location resolution</h3>
+<p>Priority order:</p>
+<ol>
+<li><strong>Device geolocation at the moment of the shot.</strong> Primary source. Browsers give no EXIF for live frames, and EXIF GPS is often missing or stripped elsewhere (behaviour varies by OS, browser and camera settings).</li>
+<li><strong>EXIF GPS in the image file.</strong> Secondary source and cross-check. Read it before stripping.</li>
+<li><strong>Manual pin or address search.</strong> Fallback and adjustment.</li>
+</ol>
+<p>Stored per issue: <code>location</code> (point), <code>location_source</code> (<code>device_gps</code> / <code>exif_gps</code> / <code>manual_pin</code>), <code>location_accuracy_m</code>, <code>location_verified</code>.</p>
+<p><code>location_verified = true</code> only if all of these hold <em>(thresholds tunable)</em>:</p>
+<ul>
+<li>the source is device or EXIF, and the point is inside the locality boundary</li>
+<li>if both device and EXIF locations exist, they agree within 100 m</li>
+<li>the capture time (server clock) is within 10 minutes of upload</li>
+<li>the IP-based city-level location does not contradict it (sanity check only)</li>
+</ul>
+<p>Also:</p>
+<ul>
+<li>Reverse-geocode to an address and admin areas (ward, municipality, district). Cache results. Work out the jurisdiction with point-in-polygon on our own boundary data, not the geocoder's.</li>
+<li>A point outside every live locality shows &quot;Civic Pulse isn't live here yet&quot; plus the waitlist.</li>
+<li>Only the issue pin is stored. If the reporter moves the pin, their raw position is discarded, so someone reporting from home does not leak their address.</li>
+<li>Honest limit: GPS and EXIF can be spoofed. &quot;Verified&quot; means consistent, not proven. Community confirmation and anti-gaming (§7) cover the rest.</li>
+<li>Office-based issues need no capture location.</li>
+</ul>
+<h3>5.4 Server pipeline (in order)</h3>
+<ol>
+<li><strong>Validate:</strong> magic-byte file type, size and dimension limits, decompression-bomb guard.</li>
+<li><strong>Extract</strong> EXIF GPS, time and orientation into database fields. This is the only place metadata survives.</li>
+<li><strong>Normalise:</strong> apply orientation, convert HEIC/PNG to JPEG or WebP, fully re-encode.</li>
+<li><strong>Strip</strong> everything else: EXIF, XMP, IPTC, embedded thumbnails.</li>
+<li><strong>Content-safety check</strong> (nudity, graphic violence): block or route to moderation.</li>
+<li><strong>Face detection and blur</strong> (§5.5). Fail closed.</li>
+<li><strong>P2:</strong> number-plate blur; flag images of documents or screens.</li>
+<li><strong>Generate variants</strong> (thumbnail, card, full, social-share image) from the blurred master only.</li>
+<li><strong>P2:</strong> perceptual hash for duplicate-photo detection.</li>
+<li><strong>Publish</strong> to the CDN under unguessable filenames; mark ready.</li>
+<li><strong>Schedule deletion</strong> of the raw upload (§5.6).</li>
+</ol>
+<p>Run as background jobs with retries and a dead-letter queue.</p>
+<h3>5.5 Face blurring</h3>
+<ul>
+<li><strong>Scope:</strong> every image (issue photos, updates, resolution photos, any future comment images). Avatars are generated, never uploaded.</li>
+<li><strong>Enforcement point:</strong> the server. Client-side blur (P2) improves privacy and preview speed but is never the only gate, because clients can be bypassed.</li>
+<li><strong>Detection:</strong> a high-recall detector, self-hosted (e.g. YuNet, RetinaFace, SCRFD) or a cloud API (e.g. AWS Rekognition, Google Cloud Vision). Run at multiple scales or tiles so small, distant faces are caught. Set the confidence threshold low: over-blurring is acceptable, missing a face is not. Cover profiles, tilted heads, masks, sunglasses, low light and children.</li>
+<li><strong>Person-detector fallback (P2):</strong> if a person is detected but no face is found in the head region, blur the estimated head area.</li>
+<li><strong>Method:</strong> expand each box by roughly 25 to 30%, then apply strong obfuscation (large-kernel blur combined with coarse pixelation, or a solid fill). Light blur or small-block pixelation can be partly reversed or still recognised.</li>
+<li><strong>Fail closed:</strong> if detection errors or times out, the image is not published.</li>
+<li><strong>User controls:</strong> users can add blur regions in the review step; nobody can remove a blur. Statues, posters and billboards may be blurred as false positives, which is accepted.</li>
+<li><strong>Community backstop:</strong> every image has &quot;Report unblurred face&quot;. One report hides the image immediately; a moderator adds blur boxes to the processed master (no raw needed) and restores it. Target review time under 1 hour <em>(tunable)</em>.</li>
+<li><strong>Derived images:</strong> thumbnails, share previews, escalation packets and before/after views all use the blurred master.</li>
+<li><strong>Quality bar</strong> <em>(tunable)</em>: build a labelled test set of at least 500 civic-scene photos (crowds, distant people, night, profiles, children, masks). Target at least 98% recall on faces over 24 px. After launch, audit 1 to 2% of published images weekly and alert if unblurred-face reports exceed 1 per 1,000 images.</li>
+<li><strong>Limits to state in the Terms and UI:</strong> blurring reduces but does not eliminate identifiability (clothing, context). The capture screen nudges: &quot;Frame the problem, not the people.&quot;</li>
+</ul>
+<h3>5.6 Storage &amp; retention</h3>
+<ul>
+<li><strong>Public bucket:</strong> processed, metadata-free variants only.</li>
+<li><strong>Raw upload:</strong> private, encrypted bucket; nobody can view it; deleted 24 hours <em>(tunable)</em> after successful processing (kept only so failed jobs can be re-run). Alternative: delete immediately (D5).</li>
+<li><strong>Reporter's raw coordinates:</strong> not stored beyond the derived fields.</li>
+<li><strong>Account deletion:</strong> cascades per ACC-08.</li>
+</ul>
+<h3>5.7 Failure handling</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Camera permission denied</td>
+<td>Gallery upload plus manual pin, labelled &quot;not verified&quot;.</td>
+</tr>
+<tr>
+<td>Location permission denied</td>
+<td>Try EXIF from the file; otherwise manual pin.</td>
+</tr>
+<tr>
+<td>No GPS in EXIF and no permission</td>
+<td>Manual pin.</td>
+</tr>
+<tr>
+<td>Poor GPS accuracy</td>
+<td>Prompt the user to adjust the pin.</td>
+</tr>
+<tr>
+<td>HEIC or unusual format</td>
+<td>Convert server-side.</td>
+</tr>
+<tr>
+<td>Weak network</td>
+<td>Resumable upload, retry queue, draft kept.</td>
+</tr>
+<tr>
+<td>Detector down or timing out</td>
+<td>Fail closed, retry queue, tell the user photos are taking longer.</td>
+</tr>
+<tr>
+<td>Desktop without a webcam</td>
+<td>Upload path.</td>
+</tr>
+<tr>
+<td>Rotated or mirrored phone images</td>
+<td>Normalise orientation before stripping metadata.</td>
+</tr>
+</tbody>
+</table>
+<h3>5.8 Test checklist</h3>
+<ul>
+<li>An automated check in CI (e.g. exiftool on outputs) proves no processed image contains metadata.</li>
+<li>Fixtures: with and without EXIF, rotated, HEIC, very large, crowds, night, children, masks, faces on posters and statues.</li>
+<li>Assert that every variant and share image derives from a blurred master.</li>
+<li>Re-run the labelled face test set whenever the model changes.</li>
+</ul>
+<hr>
+<h2>6. Auto-escalation system</h2>
+<h3>6.1 Principles</h3>
+<p>Automated, fair, hard to game, transparent, and respectful of authorities' inboxes. Escalation is a formal report, not a guarantee of action, and the UI says so.</p>
+<h3>6.2 Eligibility gates</h3>
+<p>An issue can escalate only when all of these hold:</p>
+<ol>
+<li>Status is Open (or reopened); not withdrawn, duplicate or rejected.</li>
+<li>It passed moderation with no active flags, including unblurred-face flags.</li>
+<li>A responsible authority was found (otherwise it goes to the admin &quot;Unrouted&quot; queue).</li>
+<li>Minimum age reached (24 to 48 h <em>(tunable)</em>), so duplicates can merge and flash mobs cool off.</li>
+<li>The threshold is met (§6.3).</li>
+<li>It is complete enough: category plus location or office, and at least one photo for location issues.</li>
+<li>It has not already escalated at this level.</li>
+</ol>
+<h3>6.3 Thresholds (starter values, all tunable)</h3>
+<p>Definitions: <strong>S</strong> = weighted support score (§7.1). <strong>V</strong> = distinct Verified Residents supporting. <strong>A</strong> = locality users active in the last 30 days.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Name</th>
+<th>Trigger</th>
+<th>Sent to</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0</td>
+<td>Nudge</td>
+<td>S ≥ 5 and age ≥ 24 h</td>
+<td>Author only</td>
+<td>Prompt to add detail or a better photo</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Notify</td>
+<td>S ≥ max(25, 2% of A), V ≥ 10, at least half of supporters inside the locality, age ≥ 48 h</td>
+<td>Responsible authority</td>
+<td>Formal report</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Escalate</td>
+<td>No acknowledgement 7 days after L1, or S ≥ max(100, 5% of A)</td>
+<td>Next-level authority plus elected representative</td>
+<td>Pressure</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Public follow-up</td>
+<td>No acknowledgement 21 days after L2</td>
+<td>Everyone above, and the issue is featured in the locality's &quot;Top unresolved&quot; report</td>
+<td>Accountability</td>
+</tr>
+<tr>
+<td>Fast track</td>
+<td>Hazard</td>
+<td>Severity = Hazard, S ≥ 5, V ≥ 3, and at least 3 nearby users confirm &quot;this is a hazard&quot;</td>
+<td>Responsible authority, marked URGENT</td>
+<td>Safety</td>
+</tr>
+</tbody>
+</table>
+<p>Scaling with locality size (the <code>max(...)</code> terms) stops big localities from escalating on trivial numbers and stops tiny pilots from being unreachable. Per-category multipliers let small hyper-local issues (a streetlight) need fewer supporters than city-wide ones.</p>
+<h3>6.4 Routing: which authority gets it</h3>
+<p>The authority directory (ADM-02) stores jurisdiction polygons, categories handled, contact channels and the escalation chain.</p>
+<ol>
+<li>Office-based issue: the named office, if it is in the directory.</li>
+<li>Location-based issue: point-in-polygon on jurisdiction polygons, filtered by category; choose the most specific level (ward before city).</li>
+<li>Shared responsibility: primary recipient plus cc.</li>
+<li>No match: &quot;Unrouted&quot; queue for admins, with a fallback to the locality's general grievance address.</li>
+<li>Store a routing explanation (which rule matched) with every escalation.</li>
+</ol>
+<p>The issue page shows the responsible authority and threshold progress before anything is sent.</p>
+<h3>6.5 Escalation packet</h3>
+<ul>
+<li>Reference ID (e.g. <code>CP-2026-000123</code>), title, category, severity, description.</li>
+<li>Address, coordinates, map link.</li>
+<li>Blurred photos (links plus thumbnails).</li>
+<li>First reported date and days open.</li>
+<li>Support: unique supporters, verified locals, &quot;affected too&quot; count, and which threshold triggered the send.</li>
+<li>Link to the public issue page, and prior-attempt info if the reporter gave it.</li>
+<li>The ask: acknowledge and give an expected resolution date.</li>
+<li>Signed one-click links: <strong>Acknowledge</strong>, <strong>In progress</strong> (with ETA), <strong>Resolved</strong>, <strong>Wrong department</strong> (suggest the right one), <strong>Need more information</strong>.</li>
+<li>Privacy: pseudonym only. No reporter email, phone or real name unless the reporter opts in to share contact details (P2).</li>
+<li>Neutral, factual wording; per-language templates; legal review of templates.</li>
+</ul>
+<h3>6.6 Delivery channels</h3>
+<table>
+<thead>
+<tr>
+<th>Pri</th>
+<th>Channel</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Email</td>
+<td>From a dedicated, authenticated domain (SPF, DKIM, DMARC), unique reply-to per escalation.</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Signed status links</td>
+<td>Authority responds without an account.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Portal / API adapters</td>
+<td>One adapter per official grievance system. Prefer official APIs or agreed channels over scraping or auto-filling web forms.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>WhatsApp / SMS</td>
+<td>For hazard escalations.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Digest mode</td>
+<td>Per authority: a daily or weekly ranked list instead of one email per issue.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Reply-by-email parsing</td>
+<td>Replies land on the timeline.</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>PDF report, official-account inbox</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Sending is idempotent: a ledger row per (issue, level) is checked before every send; failures retry with backoff; bounces flag the contact for admin review.</p>
+<h3>6.7 Tracking &amp; follow-up</h3>
+<ul>
+<li>Delivery states: queued → sent → delivered → opened (where trackable) → acknowledged → responded; or bounced / failed.</li>
+<li>Authority responses appear on the public timeline, labelled &quot;Authority response&quot;.</li>
+<li>&quot;Wrong department&quot; re-routes to the suggested authority (admin-approved in early phases) and is logged.</li>
+<li>Reminders at +7, +14 and +30 days after L1 without acknowledgement <em>(tunable)</em>, maximum 3, batched into one email per authority; then L2 rules apply.</li>
+<li>Author, supporters and followers are notified at every state change.</li>
+<li>Resolution cancels pending reminders.</li>
+</ul>
+<h3>6.8 Guardrails &amp; rollout</h3>
+<p><strong>Rollout modes (per locality):</strong> Off → <strong>Shadow</strong> (log what would be sent, send nothing) → <strong>Approve</strong> (an admin clicks send) → <strong>Auto</strong>. Move up only after reviewing the previous mode's output. Shadow mode is also how thresholds get tuned.</p>
+<p><strong>Guardrails</strong></p>
+<ul>
+<li>Rate limit per authority (max N emails per day <em>(tunable)</em>); overflow goes into a digest.</li>
+<li>Cluster near-identical issues into one packet with the combined support.</li>
+<li>Core fields freeze after escalation; later changes go out as an &quot;update&quot;, not a new escalation.</li>
+<li>Verified authority contacts only; admin approval for new entries.</li>
+<li>Bounce and complaint handling; opt-out requests are resolved by admins changing the channel, never ignored.</li>
+<li>Kill switch: global, per locality, per authority.</li>
+</ul>
+<h3>6.9 Audit &amp; edge cases</h3>
+<ul>
+<li>Each escalation stores the threshold version, support snapshot (S, V, counts), routing explanation, template version, payload snapshot and delivery events, so anyone can answer &quot;why was this sent, to whom, and when?&quot;.</li>
+<li><strong>Merged after escalation:</strong> keeps its ledger, supporters combine, no re-send until the next threshold.</li>
+<li><strong>Resolved before L2:</strong> cancel reminders and L2.</li>
+<li><strong>Resolution disputed:</strong> reopen, notify the authority with the evidence, restart timers from the reopen date.</li>
+<li><strong>Supporters withdraw after send:</strong> nothing is unsent; scores update.</li>
+<li><strong>Fraud found after send:</strong> admin uses &quot;Retract escalation&quot;, which sends a standard correction to the authority and is logged.</li>
+<li><strong>Author deletes account:</strong> the issue stays under &quot;Deleted user&quot;.</li>
+<li><strong>No authority in the directory:</strong> the issue sits in Unrouted; the author sees &quot;We're finding the right office.&quot;</li>
+</ul>
+<hr>
+<h2>7. Ranking, karma &amp; anti-gaming</h2>
+<h3>7.1 Support signals and weights</h3>
+<p>One support record per user per issue. &quot;Affected too&quot; includes the upvote (one tap upgrades). There are no downvotes; flags handle abuse (D3). The public UI shows simple counts; the internal weighted score <strong>S</strong> drives ranking and escalation.</p>
+<table>
+<thead>
+<tr>
+<th>Supporter</th>
+<th>Upvote</th>
+<th>Affected too</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Verified Resident in the locality</td>
+<td>1.0</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>Resident (unverified) in the locality</td>
+<td>0.5</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>Outside the locality</td>
+<td>0.25 for ranking, 0 for escalation</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Account under 24 h old</td>
+<td>0 until it ages</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Member of a flagged suspicious cluster</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Weights are <em>(tunable)</em> and not published exactly, which makes gaming harder.</p>
+<h3>7.2 Ranking</h3>
+<ul>
+<li><strong>Trending:</strong> <code>rank = S / (age_hours + 2)^g</code>, with g = 1.5 <em>(tunable)</em>, recomputed every few minutes.</li>
+<li><strong>Top:</strong> S over a selectable window (week, month, all time).</li>
+<li><strong>Most overdue:</strong> issues unresolved for 14+ days ranked by <code>S × ln(days_open)</code>, so old, well-supported problems do not decay out of sight. This is the accountability view.</li>
+<li><strong>New:</strong> chronological.</li>
+</ul>
+<h3>7.3 Karma events <em>(all tunable)</em></h3>
+<p>Karma rewards outcomes over raw likes.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issue published (passes moderation)</td>
+<td>+2 (max 3 per day)</td>
+</tr>
+<tr>
+<td>Every 5 unique verified supporters on your issue</td>
+<td>+1 (max +10 per issue)</td>
+</tr>
+<tr>
+<td>Your issue reaches L1 escalation</td>
+<td>+20</td>
+</tr>
+<tr>
+<td>Authority acknowledges your issue</td>
+<td>+10</td>
+</tr>
+<tr>
+<td>Your issue is resolved and community-confirmed</td>
+<td>+50</td>
+</tr>
+<tr>
+<td>You confirm someone's resolution (with live after-photo)</td>
+<td>+5</td>
+</tr>
+<tr>
+<td>You support an existing issue instead of posting a duplicate</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>Your comment gets 5+ helpful marks</td>
+<td>+1 (max 5 per day)</td>
+</tr>
+<tr>
+<td>Your flag is upheld by a moderator</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>Your issue is removed for breaking the rules</td>
+<td>−20</td>
+</tr>
+<tr>
+<td>Confirmed false or malicious report</td>
+<td>−50 plus sanction</td>
+</tr>
+<tr>
+<td>Repeatedly rejected flags</td>
+<td>−2 each</td>
+</tr>
+</tbody>
+</table>
+<h3>7.4 Levels &amp; badges</h3>
+<ul>
+<li><strong>Levels:</strong> Newcomer (0), Neighbour (50), Advocate (200), Champion (1,000). Neighbour raises daily limits; Advocate can confirm resolutions early and flags carry more weight; Champion becomes eligible for a moderator invitation.</li>
+<li><strong>Badges (P2):</strong> First Report, Resolver (3 confirmed resolutions), Eagle Eye (5 upheld flags), Good Neighbour (10 helpful comments). No streak mechanics; they encourage spam.</li>
+</ul>
+<h3>7.5 Anti-gaming controls</h3>
+<ul>
+<li>One account per phone number; block disposable numbers; limit number reuse.</li>
+<li><strong>Vesting:</strong> new accounts' support counts 0 toward escalation until 24 h old <em>(tunable)</em> with a verified phone.</li>
+<li><strong>Locality-only weight:</strong> only in-locality users count toward escalation.</li>
+<li><strong>Velocity checks:</strong> a burst of support (e.g. more than 20 in 5 minutes <em>(tunable)</em>) suspends weights and queues a review.</li>
+<li><strong>Cluster detection:</strong> accounts sharing device fingerprints, IP ranges or sign-up times, or that always vote together, are discounted and flagged.</li>
+<li><strong>Moderator tool:</strong> view the support graph on any issue before or after escalation.</li>
+<li><strong>Recalculation:</strong> removing accounts recomputes S; if already escalated, use Retract (§6.9).</li>
+<li><strong>Rules:</strong> vote buying and coordinated brigading are sanctionable in the Guidelines.</li>
+<li>Rate limits on supporting (§10).</li>
+</ul>
+<hr>
+<h2>8. Data model</h2>
+<p>Suggested store: PostgreSQL with PostGIS (radius queries, polygons, point-in-polygon routing). Geometry columns get GiST indexes; the feed needs an index on <code>(locality_id, status, trend_score)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Key fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td>id, handle, phone_hash, email, locality_id, role, is_verified_resident, karma, status, age_confirmed_at, created_at, last_active_at, deleted_at</td>
+</tr>
+<tr>
+<td><code>localities</code></td>
+<td>id, name, boundary (polygon), center (point), timezone, languages, emergency_numbers, escalation_mode, active</td>
+</tr>
+<tr>
+<td><code>categories</code></td>
+<td>id, slug, names (per language), icon, threshold_multiplier, is_sensitive, enabled_localities</td>
+</tr>
+<tr>
+<td><code>authorities</code></td>
+<td>id, name, level, parent_id (escalation chain), jurisdiction (polygon), category_ids, languages, expected_response_days, verified, status, digest_mode</td>
+</tr>
+<tr>
+<td><code>authority_contacts</code></td>
+<td>id, authority_id, channel (email / portal / sms / whatsapp / api), address, is_primary, last_delivery_status</td>
+</tr>
+<tr>
+<td><code>issues</code></td>
+<td>id, ref_code, author_id, locality_id, category_id, title, description, issue_type, severity, scope (spot / area), location (point), radius_m, location_source, location_accuracy_m, location_verified, address_text, admin_areas, office_name, authority_id, is_anonymous, duration_text, prior_report_ref, status, support_count, affected_count, weighted_score, verified_supporter_count, comment_count, trend_score, escalation_level, created_at, first_response_at, resolved_at, hidden_reason</td>
+</tr>
+<tr>
+<td><code>issue_images</code></td>
+<td>id, issue_id, uploader_id, kind (problem / update / after), master_key, variants, faces_blurred, manual_regions, plates_blurred, phash, captured_at_server, capture_meta, processing_status, moderation_status, raw_delete_at</td>
+</tr>
+<tr>
+<td><code>issue_links</code></td>
+<td>id, from_issue_id, to_issue_id, type (duplicate / related / recurrence)</td>
+</tr>
+<tr>
+<td><code>supports</code></td>
+<td>id, issue_id, user_id, type (upvote / affected), weight, in_locality, device_hash, ip_hash, created_at; unique on (issue_id, user_id)</td>
+</tr>
+<tr>
+<td><code>comments</code></td>
+<td>id, issue_id, user_id, parent_id, body, kind (comment / fix / official), status, created_at, edited_at</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>id, target_type, target_id, reporter_id, reason, note, status, resolved_by, created_at</td>
+</tr>
+<tr>
+<td><code>status_events</code></td>
+<td>id, issue_id, actor_type, actor_id, from_status, to_status, note, visibility, created_at</td>
+</tr>
+<tr>
+<td><code>resolution_votes</code></td>
+<td>id, issue_id, user_id, verdict (yes / no / partly), image_id, created_at</td>
+</tr>
+<tr>
+<td><code>escalations</code></td>
+<td>id, issue_id, level, authority_id, channel, status, rule_version, support_snapshot, routing_explanation, template_version, payload_snapshot, idempotency_key, response_token_hash, sent_at, delivered_at, acknowledged_at, next_reminder_at</td>
+</tr>
+<tr>
+<td><code>escalation_events</code></td>
+<td>id, escalation_id, event (queued / sent / delivered / opened / bounced / acknowledged / responded / retracted), payload, created_at</td>
+</tr>
+<tr>
+<td><code>threshold_configs</code></td>
+<td>id, locality_id, category_id (nullable), level, params, mode, version, effective_from, created_by</td>
+</tr>
+<tr>
+<td><code>notifications</code></td>
+<td>id, user_id, type, issue_id, channel, status, created_at, read_at</td>
+</tr>
+<tr>
+<td><code>karma_events</code></td>
+<td>id, user_id, event_type, points, issue_id, created_at</td>
+</tr>
+<tr>
+<td><code>user_badges</code></td>
+<td>user_id, badge, awarded_at</td>
+</tr>
+<tr>
+<td><code>moderation_actions</code></td>
+<td>id, moderator_id, target_type, target_id, action, reason_code, note, created_at</td>
+</tr>
+<tr>
+<td><code>audit_log</code></td>
+<td>id, actor_id, action, entity, before, after, ip_hash, created_at</td>
+</tr>
+<tr>
+<td><code>locality_reports</code></td>
+<td>id, locality_id, period, snapshot, published_at</td>
+</tr>
+<tr>
+<td><code>waitlist</code></td>
+<td>id, contact, coordinates, created_at</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>9. Lifecycle &amp; resolution</h2>
+<p>Escalation is a separate track (levels L0 to L3), not a status. Status describes the problem; escalation describes who has been told.</p>
+<pre class="mermaid">stateDiagram-v2
+    [*] --&gt; Processing: submitted
+    Processing --&gt; Open: photos ready and checks passed
+    Processing --&gt; Rejected: fails safety checks
+    Open --&gt; Acknowledged: authority or moderator acknowledges
+    Acknowledged --&gt; InProgress: work started
+    Open --&gt; InProgress: authority marks in progress
+    Open --&gt; AwaitingConfirmation: marked resolved
+    Acknowledged --&gt; AwaitingConfirmation: marked resolved
+    InProgress --&gt; AwaitingConfirmation: marked resolved
+    AwaitingConfirmation --&gt; Resolved: community confirms
+    AwaitingConfirmation --&gt; Open: community disputes, reopened
+    Open --&gt; Duplicate: merged into another issue
+    Open --&gt; Withdrawn: author withdraws
+    Open --&gt; Rejected: removed by moderation
+    Resolved --&gt; [*]
+</pre>
+<h3>Resolution confirmation (LIF-05)</h3>
+<ol>
+<li>Someone (authority via link, author, or moderator) marks the issue <strong>Resolved</strong>. It moves to <em>Awaiting confirmation</em> for 7 days <em>(tunable)</em>.</li>
+<li>The system asks up to 10 <em>(tunable)</em> verified locals who supported the issue (prioritising &quot;affected too&quot; and those nearest the pin): &quot;Is this fixed?&quot; <strong>Yes / No / Partly</strong>, with an optional live &quot;after&quot; photo taken within 50 m of the pin.</li>
+<li>Outcome: at least 3 Yes and Yes outnumbering No → <strong>Resolved</strong>. More No than Yes → back to <strong>Open</strong> (disputed), the authority is re-notified with the evidence. No responses by the deadline → <strong>Resolved</strong>, tagged &quot;unconfirmed&quot;.</li>
+<li>Neither the author nor the authority can confirm their own resolution; community confirmation is the source of truth.</li>
+<li>Confirmed resolutions can show a blurred before/after view and trigger karma (§7.3).</li>
+</ol>
+<hr>
+<h2>10. Limits &amp; rules</h2>
+<p><strong>Rate limits</strong> <em>(tunable)</em></p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>New account (under 7 days)</th>
+<th>Established</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issues per day</td>
+<td>2</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Comments per day</td>
+<td>20</td>
+<td>60</td>
+</tr>
+<tr>
+<td>Supports per day</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>Flags per day</td>
+<td>10</td>
+<td>20</td>
+</tr>
+<tr>
+<td>OTP requests per hour</td>
+<td>5</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Content rules (skeleton for the public Guidelines)</strong></p>
+<ol>
+<li>Report problems and institutions, not private individuals. Refer to officials by office or role; keep statements factual and relevant.</li>
+<li>No faces, personal data or private details: phone numbers, ID numbers, vehicle plates, home addresses. Redact reference numbers to the last 4 digits.</li>
+<li>Be truthful. No exaggeration or fabrication.</li>
+<li>No hate speech, harassment or threats.</li>
+<li>No party-political campaigning or promotion.</li>
+<li>Civic scope only: no ads, personal disputes or emergencies.</li>
+<li>One issue per post; search before posting.</li>
+<li>No vote manipulation, vote buying or brigading.</li>
+</ol>
+<hr>
+<h2>11. Suggested architecture (adjustable)</h2>
+<ul>
+<li><strong>Frontend:</strong> React with server rendering (e.g. Next.js) for SEO and share previews; installable PWA; MapLibre or Leaflet with OpenStreetMap tiles (or a paid tile provider).</li>
+<li><strong>Backend:</strong> Node (NestJS / Express) or Python (FastAPI / Django), REST or GraphQL.</li>
+<li><strong>Database:</strong> PostgreSQL + PostGIS. Redis for caching, rate limiting and queues.</li>
+<li><strong>Jobs:</strong> a queue (BullMQ, Celery or similar) for the image pipeline, ranking recompute, escalation scheduler, notification fan-out.</li>
+<li><strong>Storage:</strong> S3-compatible object storage behind a CDN; separate private bucket for raw uploads.</li>
+<li><strong>Image and AI workers:</strong> Python with OpenCV / Pillow / libvips; face detector (§5.5); NSFW classifier; plate detector (P2). Benchmark self-hosted against cloud APIs on the face test set (D6).</li>
+<li><strong>Geo:</strong> OSM-based geocoder (Nominatim / Photon) or a paid geocoder; check usage policies and cost; cache results. Boundary data from official GIS or OSM.</li>
+<li><strong>Email:</strong> transactional provider with authenticated domain and inbound parsing.</li>
+<li><strong>Auth:</strong> SMS OTP provider plus email login.</li>
+<li><strong>Ops:</strong> error tracking, metrics and dashboards, containerised deploys, one region near the pilot users.</li>
+</ul>
+<hr>
+<h2>12. Roadmap</h2>
+<p><strong>Phase 0: Groundwork (before code)</strong></p>
+<ul>
+<li>Choose the pilot locality (D1) and collect its boundary data.</li>
+<li>Build the authority directory for the pilot: names, categories, verified contact channels. Contact each authority personally, explain what will arrive and why, agree a channel, and ask them to whitelist the sending domain. Unannounced automated email risks landing in spam or being ignored.</li>
+<li>Draft Terms, Privacy Policy and Guidelines (§10) and get a legal review for the launch region.</li>
+<li>Recruit and train 3 to 5 volunteer moderators.</li>
+<li>Line up 2 to 3 local groups (resident associations, student groups, NGOs) to seed real issues.</li>
+<li>Assemble the face test set (§5.5).</li>
+</ul>
+<p><strong>Phase 1: MVP pilot (all P1)</strong></p>
+<p>Scope: accounts, reporting with live capture, auto-location and face-blur pipeline, feed and map, support and comments, lifecycle with authority links, escalation in Shadow then Approve mode, moderation basics, Pulse v1, in-app and email notifications, admin tools.</p>
+<p>Acceptance criteria:</p>
+<ul>
+<li>A first-time user on a mid-range phone can report a geotagged, blurred issue in under 2 minutes.</li>
+<li>100% of published images pass the automated &quot;no metadata, faces blurred&quot; check, and face-test recall meets the §5.5 target.</li>
+<li>The routing tester picks the correct authority for all test issues (build 20 across categories and areas).</li>
+<li>A shadow-mode escalation produces a complete, correct packet and a working signed response link.</li>
+<li>Flagged content reaches the moderator queue and can be hidden within minutes.</li>
+<li>At least 30 real, seeded issues are live at launch.</li>
+</ul>
+<p><strong>Phase 2: Trust and accountability</strong></p>
+<p>Verified Residents, community-confirmed resolution, before/after, authority scoreboard, locality reports, Auto escalation mode, WhatsApp/SMS for hazards, PWA push and offline drafts, on-device pre-blur, plate blur, anonymous posting, duplicate-photo detection, area-wide issues, nearby alerts, appeals, second locality.</p>
+<p><strong>Phase 3: Scale and integration</strong></p>
+<p>Official accounts, portal/API integrations, auto-translation, open data, sensitive-category workflows, moderation transparency reports, volunteer and NGO features, native wrapper if PWA limits bite.</p>
+<hr>
+<h2>13. Metrics</h2>
+<ul>
+<li><strong>North star:</strong> confirmed resolutions per locality per month.</li>
+<li><strong>Outcomes:</strong> % of escalated issues acknowledged within 7 days; median time to first response; median time to resolution; resolution rate at 30 and 90 days.</li>
+<li><strong>Engagement:</strong> weekly active residents as a share of estimated locality population; reports per active user; supports per issue; share of issues with at least one comment; week-4 retention.</li>
+<li><strong>Quality:</strong> duplicate rate; share of issues with verified location; flag rate; median moderation time.</li>
+<li><strong>Pipeline health:</strong> photo processing p95; processing failure rate; unblurred-face reports per 1,000 images; escalation delivery and bounce rates; retracted escalations.</li>
+<li><strong>Guardrails:</strong> harassment reports per 1,000 posts; suspected fake-account rate.</li>
+</ul>
+<hr>
+<h2>14. Risks &amp; mitigations</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authorities ignore escalations</td>
+<td>Onboard them first (Phase 0), reminders and next-level escalation, public timelines and scoreboard, exportable reports for press and representatives.</td>
+</tr>
+<tr>
+<td>Vote brigading or fake accounts</td>
+<td>§7.5: vesting, locality-only weight, velocity and cluster detection, Approve mode before auto-send.</td>
+</tr>
+<tr>
+<td>Unblurred face or privacy leak</td>
+<td>Fail-closed pipeline, instant hide on report, weekly audits, short raw retention, legal review.</td>
+</tr>
+<tr>
+<td>Defamation or naming individuals</td>
+<td>Guidelines, PII detection, sensitive-category hold, takedown and right-of-reply process.</td>
+</tr>
+<tr>
+<td>Empty platform</td>
+<td>One-locality pilot, seeding through local groups, team-reported issues.</td>
+</tr>
+<tr>
+<td>Location spoofing</td>
+<td>Layered verification, community confirmation; &quot;verified&quot; means consistent, not proven.</td>
+</tr>
+<tr>
+<td>Spamming authorities</td>
+<td>Guardrails in §6.8, digests, clustering, kill switch.</td>
+</tr>
+<tr>
+<td>Moderation overload</td>
+<td>Auto-moderation, volunteer moderators, flag weighting.</td>
+</tr>
+<tr>
+<td>Political capture</td>
+<td>Neutrality rules, no campaigning, transparent moderation.</td>
+</tr>
+<tr>
+<td>Cost of image processing and geocoding</td>
+<td>Client-side compression, self-hosted models, cached geocoding.</td>
+</tr>
+<tr>
+<td>Users treat it as an emergency service</td>
+<td>Prominent disclaimer; hazard flow shows the local emergency number.</td>
+</tr>
+<tr>
+<td>Low-end devices and poor networks</td>
+<td>Small payloads, resumable uploads, drafts, gallery fallback.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>15. Open decisions</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Decision</th>
+<th>Recommended default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>Pilot locality and boundary data source</td>
+<td>One ward, neighbourhood or campus with an accessible boundary file and reachable authorities.</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Sign-up method</td>
+<td>Phone OTP, optional email.</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Downvotes</td>
+<td>None; use flags.</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>Live capture only, or gallery fallback</td>
+<td>Live capture is the main path; gallery fallback labelled &quot;location not verified&quot;.</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>Raw photo retention</td>
+<td>Delete 24 hours after processing (or immediately).</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Face detection: self-hosted vs cloud API</td>
+<td>Benchmark both on the test set; lean self-hosted for privacy and cost.</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>Escalation rollout</td>
+<td>Shadow → Approve → Auto, per locality.</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>Threshold numbers</td>
+<td>§6.3 starters, tuned in Shadow mode.</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>Authority onboarding</td>
+<td>Personal outreach and an agreed channel before the first automated email.</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>Anonymous posting</td>
+<td>P2.</td>
+</tr>
+<tr>
+<td>D11</td>
+<td>Launch languages</td>
+<td>Local language plus English; strings externalised from day one.</td>
+</tr>
+<tr>
+<td>D12</td>
+<td>Legal set-up</td>
+<td>Legal entity, owner of Terms and Privacy Policy, privacy law of the launch region.</td>
+</tr>
+<tr>
+<td>D13</td>
+<td>Moderation staffing</td>
+<td>3 to 5 volunteers per locality plus platform admins.</td>
+</tr>
+<tr>
+<td>D14</td>
+<td>Brand, domain, funding model</td>
+<td>Grants, partnerships or donations; no ad targeting on civic content.</td>
+</tr>
+</tbody>
+</table>
+
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+</body></html>
